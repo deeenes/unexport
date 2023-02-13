@@ -32,6 +32,8 @@ class Session:
     def get_expected_all(
             source: str,
             refactor: bool = False,
+            long_lines: bool = False,
+            single_quotes: bool = False,
         ) -> tuple[bool, list[str]]:
 
         analyzer = Analyzer(source=source)
@@ -39,7 +41,11 @@ class Session:
         match = analyzer.actual_all == analyzer.expected_all
         expected_all = analyzer.expected_all
         if refactor:
-            expected_all = refactor_all(expected_all)
+            expected_all = refactor_all(
+                expected_all,
+                long_lines=long_lines,
+                single_quotes=single_quotes,
+            )
         return match, expected_all
 
     @classmethod

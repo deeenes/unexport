@@ -85,6 +85,8 @@ def main(argv: Sequence[str] | None = None) -> int:
                 match, expected_all = session.get_expected_all(
                     source,
                     refactor = args.refactor,
+                    long_lines=args.long_lines,
+                    single_quotes=args.single_quotes,
                 )
                 if match:
                     continue
@@ -94,12 +96,7 @@ def main(argv: Sequence[str] | None = None) -> int:
             if expected_all:
                 exit_code = 1
             if args.refactor:
-                session.refactor(
-                    path=py_path,
-                    apply=True,
-                    long_lines=args.long_lines,
-                    single_quotes=args.single_quotes,
-                )
+                session.refactor(path=py_path, apply=True)
                 print(f"Refactoring '{color.paint(str(py_path), color.GREEN)}'")
             if args.diff:
                 new_source = session.refactor(path=py_path, apply=False)

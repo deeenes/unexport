@@ -35,7 +35,11 @@ def _find_location(source: str) -> _Location:
     return location
 
 
-def refactor_all(expected_all: list[str]) -> str:
+def refactor_all(
+        expected_all: list[str],
+        long_lines: bool = False,
+        single_quotes: bool = False,
+    ) -> str:
 
     if not expected_all:
         return ''
@@ -57,8 +61,6 @@ def refactor_all(expected_all: list[str]) -> str:
 def refactor_source(
         source: str,
         refactored_all: list[str],
-        long_lines: bool = False,
-        single_quotes: bool = False,
     ) -> str:
 
     if not refactored_all:
