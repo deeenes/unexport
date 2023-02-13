@@ -59,9 +59,10 @@ def refactor_source(
     refactored_all = expected_all
     if not long_lines:
         refactored_all = relinebreak.sub('\\1\n    ', str(expected_all))[:-1]
+        ending = ']\n' if long_lines else ',\n]\n'
     if single_quotes:
         refactored_all = refactored_all.replace('"', "'")
-    refactored_all = f"{refactored_all}{'' if long_lines else ',\n'}]\n"
+    refactored_all = f"{refactored_all}{ending}"
     refactored_all = f"__all__ = {refactored_all}"
     lines.insert(location.start, refactored_all)
 
