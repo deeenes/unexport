@@ -14,25 +14,44 @@ __all__ = ("Session",)
 
 @dataclass
 class Session:
+
     config: Config
 
     def get_source(self, path: Path) -> Iterator[tuple[str, Path]]:
-        for py_path in utils.list_paths(path, include=self.config.include, exclude=self.config.exclude):
+
+        for py_path in utils.list_paths(
+            path,
+            include=self.config.include,
+            exclude=self.config.exclude,
+        ):
+
             source, _ = utils.read(py_path)
             yield source, py_path
 
     @staticmethod
     def get_expected_all(source: str) -> tuple[bool, list[str]]:
+
         analyzer = Analyzer(source=source)
         analyzer.traverse()
         match = analyzer.actual_all == analyzer.expected_all
         return match, analyzer.expected_all
 
     @classmethod
-    def refactor(cls, path: Path, apply: bool = False) -> str:
+    def refactor(
+            cls,
+            path: Path, apply: bool = False,
+            long_lines: bool = False,
+            single_quotes: bool = False,
+        ) -> str:
+
         source, encoding = utils.read(path)
         _, expected_all = cls.get_expected_all(source)
-        new_source = refactor_source(source, expected_all)
+        new_source = refactor_source(
+            source,
+            expected_all,
+            long_lines = long_lines,
+            single_quotes = single_quotes,
+        )
         if apply and new_source != source:
             path.write_text(new_source, encoding=encoding)
         return new_source

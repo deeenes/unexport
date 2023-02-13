@@ -2,6 +2,7 @@ from __future__ import annotations
 
 import ast
 from typing import NamedTuple
+import re
 
 __all__ = ("refactor_source",)
 
@@ -16,20 +17,36 @@ def _find_location(source: str) -> _Location:
     location = _Location()
     tree = ast.parse(source)
     for node in tree.body:
-        if isinstance(node, ast.Assign) and getattr(node.targets[0], "id", None) == "__all__":
+        if (
+            isinstance(node, ast.Assign) and
+            getattr(node.targets[0], "id", None) == "__all__"
+        ):
+
             return location._replace(
                 start=node.lineno - 1,
                 end=node.end_lineno or 0,
                 all_exists=True,
             )
-        elif isinstance(node, (ast.Import, ast.ImportFrom)) and node.lineno > location.start:
+        elif (
+            isinstance(node, (ast.Import, ast.ImportFrom)) and
+            node.lineno > location.start
+        ):
             location = location._replace(start=node.end_lineno or 0)
     return location
 
 
-def refactor_source(source: str, expected_all: list[str]) -> str:
+def refactor_source(
+        source: str,
+        expected_all: list[str],
+        long_lines: bool = False,
+        single_quotes: bool = False,
+    ) -> str:
+
     if not expected_all:
         return source
+
+    relinebreak = re.compile(r'([\[,]) ?')
+
     location = _find_location(source)
     lines = ast._splitlines_no_ff(source)  # type: ignore
 
@@ -39,7 +56,13 @@ def refactor_source(source: str, expected_all: list[str]) -> str:
         else:
             del lines[location.start]
 
-    refactored_all = f"__all__ = {str(expected_all)}\n".replace("'", '"')
+    refactored_all = expected_all
+    if not long_lines:
+        refactored_all = relinebreak.sub('\\1\n    ', str(expected_all))[:-1]
+    if single_quotes:
+        refactored_all = refactored_all.replace('"', "'")
+    refactored_all = f"{refactored_all}{'' if long_lines else ',\n'}]\n"
+    refactored_all = f"__all__ = {refactored_all}"
     lines.insert(location.start, refactored_all)
 
     next_line = lines[location.start + 1]
