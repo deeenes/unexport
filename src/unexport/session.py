@@ -58,12 +58,7 @@ class Session:
 
         source, encoding = utils.read(path)
         _, expected_all = cls.get_expected_all(source)
-        new_source = refactor_source(
-            source,
-            expected_all,
-            long_lines = long_lines,
-            single_quotes = single_quotes,
-        )
+        new_source = refactor_source(source, expected_all)
         if apply and new_source != source:
             path.write_text(new_source, encoding=encoding)
         return new_source
