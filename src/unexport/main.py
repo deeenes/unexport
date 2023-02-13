@@ -40,12 +40,6 @@ def main(argv: Sequence[str] | None = None) -> int:
         help="Allow long lines, instead of line breaks after each item.",
     )
     parser.add_argument(
-        "-r",
-        "--refactor",
-        action="store_true",
-        help="Auto-sync __all__ list in python modules automatically.",
-    )
-    parser.add_argument(
         "-q",
         "--single_quotes",
         action="store_true",
