@@ -28,6 +28,12 @@ def main(argv: Sequence[str] | None = None) -> int:
         type=Path,
     )
     parser.add_argument(
+        "-d",
+        "--diff",
+        action="store_true",
+        help="Prints a diff of all the changes Unexport would make to a file.",
+    )
+    parser.add_argument(
         "-r",
         "--refactor",
         action="store_true",
