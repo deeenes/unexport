@@ -88,7 +88,7 @@ def main(argv: Sequence[str] | None = None) -> int:
             except SyntaxError as e:
                 color.paint(str(e) + "at " + py_path.as_posix(), color.RED)
                 continue
-            else:
+            if expected_all:
                 exit_code = 1
             if args.refactor:
                 session.refactor(
