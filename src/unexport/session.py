@@ -7,7 +7,7 @@ from typing import Iterator
 from unexport import utils
 from unexport.analyzer import Analyzer
 from unexport.config import Config
-from unexport.refactor import refactor_all, refactor_source
+from unexport.refactor import refactor_source
 
 __all__ = ("Session",)
 
@@ -29,23 +29,11 @@ class Session:
             yield source, py_path
 
     @staticmethod
-    def get_expected_all(
-            source: str,
-            refactor: bool = False,
-            long_lines: bool = False,
-            single_quotes: bool = False,
-        ) -> tuple[bool, list[str]]:
+    def get_expected_all(source: str) -> tuple[bool, list[str]]:
 
         analyzer = Analyzer(source=source)
         analyzer.traverse()
         match = analyzer.actual_all == analyzer.expected_all
-        expected_all = analyzer.expected_all
-        if refactor:
-            expected_all = refactor_all(
-                expected_all,
-                long_lines=long_lines,
-                single_quotes=single_quotes,
-            )
         return match, expected_all
 
     @classmethod
@@ -58,7 +46,12 @@ class Session:
 
         source, encoding = utils.read(path)
         _, expected_all = cls.get_expected_all(source)
-        new_source = refactor_source(source, expected_all)
+        new_source = refactor_source(
+            source,
+            expected_all,
+            long_lines=long_lines,
+            single_quotes=single_quotes,
+        )
         if apply and new_source != source:
             path.write_text(new_source, encoding=encoding)
         return new_source

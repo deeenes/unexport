@@ -35,7 +35,7 @@ def _find_location(source: str) -> _Location:
     return location
 
 
-def refactor_all(
+def format_all(
         expected_all: list[str],
         long_lines: bool = False,
         single_quotes: bool = False,
@@ -60,7 +60,9 @@ def refactor_all(
 
 def refactor_source(
         source: str,
-        refactored_all: list[str],
+        expected_all: list[str],
+        long_lines: bool = False,
+        single_quotes: bool = False,
     ) -> str:
 
     if not refactored_all:
@@ -75,7 +77,12 @@ def refactor_source(
         else:
             del lines[location.start]
 
-    lines.insert(location.start, refactored_all)
+    formatted_all = format_all(
+        expected_all,
+        long_lines=long_lines,
+        single_quotes=single_quotes,
+    )
+    lines.insert(location.start, formatted_all)
 
     next_line = lines[location.start + 1]
     previous_line = lines[location.start - 1]

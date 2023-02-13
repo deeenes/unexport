@@ -82,21 +82,21 @@ def main(argv: Sequence[str] | None = None) -> int:
     for path in args.sources:
         for source, py_path in session.get_source(path):
             try:
-                match, expected_all = session.get_expected_all(
-                    source,
-                    refactor = args.refactor,
-                    long_lines=args.long_lines,
-                    single_quotes=args.single_quotes,
-                )
-                if match:
+                match, expected_all = session.get_expected_all(source)
+                if match or not expected_all:
                     continue
             except SyntaxError as e:
                 color.paint(str(e) + "at " + py_path.as_posix(), color.RED)
                 continue
-            if expected_all:
-                exit_code = 1
+            else:
+                exit_code=1
             if args.refactor:
-                session.refactor(path=py_path, apply=True)
+                session.refactor(
+                    path=py_path,
+                    apply=True,
+                    long_lines=args.long_lines,
+                    single_quotes=args.single_quotes,
+                )
                 print(f"Refactoring '{color.paint(str(py_path), color.GREEN)}'")
             if args.diff:
                 new_source = session.refactor(path=py_path, apply=False)
