@@ -35,17 +35,34 @@ def _find_location(source: str) -> _Location:
     return location
 
 
+def refactor_all(expected_all: list[str]) -> str:
+
+    if not expected_all:
+        return ''
+
+    relinebreak = re.compile(r'([\[,]) ?')
+
+    refactored_all = expected_all
+    if not long_lines:
+        refactored_all = relinebreak.sub('\\1\n    ', str(expected_all))[:-1]
+        ending = ']\n' if long_lines else ',\n]\n'
+    if single_quotes:
+        refactored_all = refactored_all.replace('"', "'")
+    refactored_all = f"{refactored_all}{ending}"
+    refactored_all = f"__all__ = {refactored_all}"
+
+    return refactored_all
+
+
 def refactor_source(
         source: str,
-        expected_all: list[str],
+        refactored_all: list[str],
         long_lines: bool = False,
         single_quotes: bool = False,
     ) -> str:
 
-    if not expected_all:
+    if not refactored_all:
         return source
-
-    relinebreak = re.compile(r'([\[,]) ?')
 
     location = _find_location(source)
     lines = ast._splitlines_no_ff(source)  # type: ignore
@@ -56,14 +73,6 @@ def refactor_source(
         else:
             del lines[location.start]
 
-    refactored_all = expected_all
-    if not long_lines:
-        refactored_all = relinebreak.sub('\\1\n    ', str(expected_all))[:-1]
-        ending = ']\n' if long_lines else ',\n]\n'
-    if single_quotes:
-        refactored_all = refactored_all.replace('"', "'")
-    refactored_all = f"{refactored_all}{ending}"
-    refactored_all = f"__all__ = {refactored_all}"
     lines.insert(location.start, refactored_all)
 
     next_line = lines[location.start + 1]

@@ -82,7 +82,10 @@ def main(argv: Sequence[str] | None = None) -> int:
     for path in args.sources:
         for source, py_path in session.get_source(path):
             try:
-                match, expected_all = session.get_expected_all(source)
+                match, expected_all = session.get_expected_all(
+                    source,
+                    refactor = args.refactor,
+                )
                 if match:
                     continue
             except SyntaxError as e:
