@@ -34,7 +34,7 @@ class Session:
         analyzer = Analyzer(source=source)
         analyzer.traverse()
         match = analyzer.actual_all == analyzer.expected_all
-        return match, expected_all
+        return match, analyzer.expected_all
 
     @classmethod
     def refactor(

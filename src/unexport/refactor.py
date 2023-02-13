@@ -46,16 +46,16 @@ def format_all(
 
     relinebreak = re.compile(r'([\[,]) ?')
 
-    refactored_all = expected_all
+    formatted_all = expected_all
     if not long_lines:
-        refactored_all = relinebreak.sub('\\1\n    ', str(expected_all))[:-1]
+        formatted_all = relinebreak.sub('\\1\n    ', str(expected_all))[:-1]
         ending = ']\n' if long_lines else ',\n]\n'
     if single_quotes:
-        refactored_all = refactored_all.replace('"', "'")
-    refactored_all = f"{refactored_all}{ending}"
-    refactored_all = f"__all__ = {refactored_all}"
+        formatted_all = formatted_all.replace('"', "'")
+    formatted_all = f"{formatted_all}{ending}"
+    formatted_all = f"__all__ = {formatted_all}"
 
-    return refactored_all
+    return formatted_all
 
 
 def refactor_source(
@@ -65,7 +65,7 @@ def refactor_source(
         single_quotes: bool = False,
     ) -> str:
 
-    if not refactored_all:
+    if not expected_all:
         return source
 
     location = _find_location(source)
